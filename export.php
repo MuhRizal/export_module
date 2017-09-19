@@ -1,14 +1,41 @@
 <?php 
 	error_reporting(0);
-	if(!isset($_POST)) { 
-		echo "You must fill the generate report form.";
-		echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a>";
+	if(empty($_POST)) { 
+		echo "<div style='font-family:arial;text-align:center;'><br />You must fill the generate report form.";
+		echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a></div>";
 		die; 
 	}
 	$post_id="";
 	$module_id=$_POST['module_id'];
 	$startDate=$_POST['startDate'];
 	$endDate=$_POST['endDate'];
+	
+	function checkmydate($date) {
+		$tempDate = explode('-', $date);
+		return checkdate($tempDate[0], $tempDate[1], $tempDate[2]);
+	}
+		
+	if(!checkmydate($startDate)){
+		echo "<div style='font-family:arial;text-align:center;'><br />Sorry, the date range you selected is invalid. Please try again.";
+		echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a></div>";
+		die;
+	}
+	if(!checkmydate($endDate)){
+		echo "<div style='font-family:arial;text-align:center;'><br />Sorry, the date range you selected is invalid. Please try again.";
+		echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a></div>";
+		die;
+	}
+	
+	$ns=str_replace("-","/",$startDate);
+	$ne=str_replace("-","/",$endDate);
+	$s = new DateTime($ns);
+	$e = new DateTime($ne);
+	
+	if($s->format('U')>$e->format('U')){
+		echo "<div style='font-family:arial;text-align:center;'>Sorry, the date range you selected is invalid. Please try again.";
+		echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a></div>";
+		die;
+	}
 	
 	if($module_id==1) { $module_name="Colonoscopy";} 
 	else if($module_id==2) { $module_name="Upper Endoscopy";} 
@@ -170,8 +197,8 @@
 				$rowCount++;
 				
 				if($rowCount>10000){
-					echo "The number of reported records will exceed 10,000. Please use a narrower date range.";
-					echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a>";
+					echo "<div style='font-family:arial;text-align:center;'><br />The number of reported records will exceed 10,000. Please use a narrower date range.";
+					echo "<br /><a href='/export_module'>&laquo; Go to generate report form</a></div>";
 					die;
 				}
 			}

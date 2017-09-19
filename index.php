@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Export Module</title>
+	<title>Report Export Module</title>
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/bootstrap-select.css">
@@ -33,14 +33,14 @@
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Export Module</a>
+      <a class="navbar-brand" href="#">Report Export Module</a>
     </div>
   </div>
 </nav>
 
 <div class="container">
 	<hr />
-	<form method="POST" action="export.php"  class="form-inline">
+	<form method="POST" action="export.php" id="export-form" class="form-inline">
 	<?php
 		include "connect.php";
 		$now=date('m-d-Y');
@@ -93,9 +93,9 @@
 				<label class="control-label">Date Range</label>
 			</div>
 			<div class="col-md-10">
-				<input type="text" style="max-width:170px;display:inline-block;" class="form-control datepicker" name="startDate" id="startDate"  value="<?php echo $prevDate;?>"/>
+				<input type="text" style="max-width:170px;display:inline-block;" class="form-control datepicker" name="startDate" id="startDate"  value="<?php echo $prevDate;?>" required />
 				<span style="display:inline-block;"> &nbsp; to &nbsp; </span> 
-				<input type="text" style="max-width:170px;display:inline-block;" class="form-control datepicker" name="endDate" id="endDate" value="<?php echo $now;?>"/>
+				<input type="text" style="max-width:170px;display:inline-block;" class="form-control datepicker" name="endDate" id="endDate" value="<?php echo $now;?>" required />
 				
 			</div>
 		</div>
@@ -110,8 +110,6 @@
 
 <script>
 	$(document).ready(function () {
-		
-		
 		
 		$('.js-data-ajax').select2({
 			placeholder: 'Type name, email, or APN',
@@ -161,10 +159,54 @@
 			}
 		});
 		
-		
+		/**
 		$(".datepicker").datepicker({
 			dateFormat: 'mm-dd-yy'
 		}); 
+		**/
+		
+		$("#startDate").datepicker({
+			dateFormat: 'mm-dd-yy',
+			onSelect: function(dateText, inst) {
+				var startdate = $(this).val();
+				var endDate=$("#endDate").val();
+				if(endDate!="") {
+					let epS = new Date(startdate).getTime();
+					let epE = new Date(endDate).getTime();
+					if(epE<epS){
+						alert('End date must be greater than start date');
+						$("#startDate").val('');
+					}
+				}
+			}
+		});
+		
+		$("#endDate").datepicker({
+			dateFormat: 'mm-dd-yy',
+			onSelect: function(dateText, inst) {
+				var endDate = $(this).val();
+				var startdate=$("#startDate").val();
+				if(startdate!="") {
+					let epS = new Date(startdate).getTime();
+					let epE = new Date(endDate).getTime();
+					if(epE<epS){
+						alert('End date must be greater than start date');
+						$("#endDate").val('');
+					}
+				}
+			}
+		});
+		
+		$("#export-form").on("submit", function() { 
+			var endDate		= $("#endDate").val();
+			var startdate	= $("#startDate").val();
+			if (endDate=="" || startdate=="") { 
+				alert("Please fill the start date and end date");
+				return false; 
+			} else {
+				return true; 
+			}
+		});
 	});
 </script>
 </body>
